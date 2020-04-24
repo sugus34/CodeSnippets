@@ -1,52 +1,123 @@
 {
-    "type": "Microsoft.VirtualMachineImages",
-    "apiVersion": "2019-05-01-preview",
-    "location": "westeurope",
-    "dependsOn": [],
-	  "tags": {
-      "imagebuilderTemplate": "windows10"
-            },
-    "properties": {
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"publisher": {
+			"type": "string",
+			"defaultValue": "MicrosoftWindowsDesktop"
+		},
+		"offer": {
+			"type": "string",
+			"defaultValue": "office-365"
+		},
+		"sku": {
+			"type": "string",
+			"defaultValue": "19h2-evd-o365pp"
+		},
+		"version": {
+			"type": "string",
+			"defaultValue": "latest",
+			"metadata": {
+				"description": "Version of the image, can be found with powershell: Get-AzVMImage -Location westeurope -PublisherName MicrosoftWindowsDesktop -Offer windows-10 -Skus 19h1-evd"
+			}
+		},
+		"SIGImageDefinitionId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9b4d1c86-8825-47d7-94fd-a0d5380ebe5b/resourceGroups/rg-ImageGallery-WEU/providers/Microsoft.Compute/galleries/SharedImageGallery/images/w101909o365pp",
+			"metadata": {
+				"description": "Id of Shared Image Gallery to distribute image to, eg: /subscriptions/<subscriptionID>/resourceGroups/<SIG resourcegroup>/providers/Microsoft.Compute/galleries/<SIG name>/images/<image definition>"
+			}
+		},
+		"ManagedImageName": {
+			"type": "string",
+			"defaultValue": "AIB-W10Image2",
+			"metadata": {
+				"description": "Name of the managed image, it will be created in the AIB resourcegroup"
+			}
+		},
+		"randomGUID": {
+			"type": "string",
+			"defaultValue": "[newGuid()]"
+		}
+	},
+	"variables": {
+		"imageTemplateName": "[concat('AIB',uniqueString('deployment().name',parameters('randomGUID')))]",
+		"ManagedImageId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Compute/images/',parameters('ManagedImageName'))]"
+	},
+	"resources": [
+		{
+			"name": "[variables('imageTemplateName')]",
+			"type": "Microsoft.VirtualMachineImages/imageTemplates",
+			"apiVersion": "2019-05-01-preview",
+			"location": "[resourcegroup().location]",
+			"dependsOn": [
+			],
+			"properties": {
+				"buildTimeoutInMinutes" : 100,
+				"source": {
+					"type": "PlatformImage",
+					"publisher": "[parameters('publisher')]",
+					"offer": "[parameters('offer')]",
+					"sku": "[parameters('sku')]",
+					"version": "[parameters('version')]"
+				},
+				"customize": [
+					{
+						"type": "PowerShell",
+						"name": "InstallChocolatey",
+						"runElevated": true,
+						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/InstallChocolatey.ps1"
+					},
+					{
+						"type": "PowerShell",
+						"name": "InstallApps",
+						"runElevated": true,
+						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/PowershellCustomizationW10O365-1909.ps1"
+					},
+					{
+						"type": "WindowsRestart",
+						"restartCommand": "shutdown /r /f /t 0", 
+						"restartCheckCommand": "echo Azure-Image-Builder-Restarted-the-VM  > c:\\temp\\azureImageBuilderRestart.txt",
+						"restartTimeout": "30m"
+					},
+					{
+						"type": "WindowsUpdate",
+						"searchCriteria": "IsInstalled=0",
+						"filters": [
+							"exclude:$_.Title -like '*Preview*'",
+							"include:$true"
+									],
+						"updateLimit": 20
+					}
+				],
+				"distribute": [
+					{
+						"type": "SharedImage",
+						"galleryImageId": "[parameters('SIGImageDefinitionId')]",
+						"runOutputName": "SIGimage",
+						"artifactTags": {
+						},
+						"replicationRegions": [
+							"westeurope"
+						]
+					},
+					{
+						"type": "ManagedImage",
+						"imageId": "[variables('ManagedImageId')]",
+						"location": "[resourceGroup().location]",
+						"runOutputName": "AIBimage",
+						"artifactTags": {
+						}
+					}
 
-        "buildTimeoutInMinutes" : 100,
-        
-        "vmProfile": 
-            {
-            "vmSize": "Standard_D2s_v3",
-            "osDiskSizeGB": 63
-            },
-
-        "source": {
-            "type": "PlatformImage",
-                "publisher": "MicrosoftWindowsDesktop",
-                "offer": "office-365",
-                "sku": "19h2-evd-o365pp",
-                "version": "latest"
-        },
-    "customize": [
-            {
-                "type": "WindowsUpdate",
-                "searchCriteria": "IsInstalled=0",
-                "filters": [
-                    "exclude:$_.Title -like '*Preview*'",
-                    "include:$true"
-                            ],
-                "updateLimit": 50
-            }
-        ],
-    "distribute":   [
-            {   
-                "type": "SharedImage",
-                "galleryImageId": "/subscriptions/9b4d1c86-8825-47d7-94fd-a0d5380ebe5b/resourceGroups/rg-ImageGallery-WEU/providers/Microsoft.Compute/galleries/SharedImageGallery/images/w101909o365pp",
-                "runOutputName": "w101909o365ppr01",
-                "artifactTags": {
-                    "source": "azureVmImageBuilder",
-                    "baseosimg": "windows10"
-                },
-                "replicationRegions": [
-                      "westeurope"
-                    ]
-            }
-        ]
-    }
+				]
+			}
+		}
+	],
+	"outputs": {
+		"ImageTemplateName": {
+			"type": "string",
+			"value": "[variables('imageTemplateName')]"
+		}
+	}
 }

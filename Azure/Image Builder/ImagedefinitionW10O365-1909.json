@@ -28,21 +28,13 @@
 				"description": "Id of Shared Image Gallery to distribute image to, eg: /subscriptions/<subscriptionID>/resourceGroups/<SIG resourcegroup>/providers/Microsoft.Compute/galleries/<SIG name>/images/<image definition>"
 			}
 		},
-		"ManagedImageName": {
-			"type": "string",
-			"defaultValue": "AIB-W10Image2",
-			"metadata": {
-				"description": "Name of the managed image, it will be created in the AIB resourcegroup"
-			}
-		},
 		"randomGUID": {
 			"type": "string",
 			"defaultValue": "[newGuid()]"
 		}
 	},
 	"variables": {
-		"imageTemplateName": "[concat('AIB',uniqueString('deployment().name',parameters('randomGUID')))]",
-		"ManagedImageId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Compute/images/',parameters('ManagedImageName'))]"
+		"imageTemplateName": "[concat('AIB',uniqueString('deployment().name',parameters('randomGUID')))]"
 	},
 	"resources": [
 		{
@@ -100,16 +92,7 @@
 						"replicationRegions": [
 							"westeurope"
 						]
-					},
-					{
-						"type": "ManagedImage",
-						"imageId": "[variables('ManagedImageId')]",
-						"location": "[resourceGroup().location]",
-						"runOutputName": "AIBimage",
-						"artifactTags": {
-						}
-					}
-
+					}				
 				]
 			}
 		}
