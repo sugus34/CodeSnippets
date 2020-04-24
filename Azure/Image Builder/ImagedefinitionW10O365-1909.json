@@ -23,7 +23,7 @@
 		},
 		"ScriptUri": {
 			"type": "string",
-			"defaultValue": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/PowershellCustomizationW10O365-1909.ps1?token=AEZ24P46IZOOLKUF6IYB3FK6ULPNQ",
+			"defaultValue": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/PowershellCustomizationW10O365-1909.ps1",
 			"metadata": {
 				"description": "Location of powershell script to customize your image"
 			}
