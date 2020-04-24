@@ -37,7 +37,7 @@
 		}
 	},
 	"variables": {
-		"imageTemplateName": "[concat('AIB',uniqueString('deployment().name',[newGuid()]))]",
+		"imageTemplateName": "[concat('AIB',uniqueString('deployment().name',newGuid()))]",
 		"ManagedImageId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Compute/images/',parameters('ManagedImageName'))]"
 	},
 	"resources": [
