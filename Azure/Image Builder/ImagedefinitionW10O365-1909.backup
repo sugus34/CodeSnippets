@@ -1,0 +1,52 @@
+{
+    "type": "Microsoft.VirtualMachineImages",
+    "apiVersion": "2019-05-01-preview",
+    "location": "westeurope",
+    "dependsOn": [],
+	  "tags": {
+      "imagebuilderTemplate": "windows10"
+            },
+    "properties": {
+
+        "buildTimeoutInMinutes" : 100,
+        
+        "vmProfile": 
+            {
+            "vmSize": "Standard_D2s_v3",
+            "osDiskSizeGB": 63
+            },
+
+        "source": {
+            "type": "PlatformImage",
+                "publisher": "MicrosoftWindowsDesktop",
+                "offer": "office-365",
+                "sku": "19h2-evd-o365pp",
+                "version": "latest"
+        },
+    "customize": [
+            {
+                "type": "WindowsUpdate",
+                "searchCriteria": "IsInstalled=0",
+                "filters": [
+                    "exclude:$_.Title -like '*Preview*'",
+                    "include:$true"
+                            ],
+                "updateLimit": 50
+            }
+        ],
+    "distribute":   [
+            {   
+                "type": "SharedImage",
+                "galleryImageId": "/subscriptions/9b4d1c86-8825-47d7-94fd-a0d5380ebe5b/resourceGroups/rg-ImageGallery-WEU/providers/Microsoft.Compute/galleries/SharedImageGallery/images/w101909o365pp",
+                "runOutputName": "w101909o365ppr01",
+                "artifactTags": {
+                    "source": "azureVmImageBuilder",
+                    "baseosimg": "windows10"
+                },
+                "replicationRegions": [
+                      "westeurope"
+                    ]
+            }
+        ]
+    }
+}
