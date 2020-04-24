@@ -25,12 +25,6 @@ choco install notepadplusplus
 #Start sleep
 Start-Sleep -Seconds 10
 
-# Chocolatey install Windows Terminal
-choco install microsoft-windows-terminal
-
-#Start sleep
-Start-Sleep -Seconds 10
-
 ##Install VSCode
 #Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?Linkid=852157' -OutFile 'c:\temp\VScode.exe'
 #Invoke-Expression -Command 'c:\temp\VScode.exe /verysilent'
