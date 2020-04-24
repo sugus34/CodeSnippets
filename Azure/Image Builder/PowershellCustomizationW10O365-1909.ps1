@@ -1,24 +1,52 @@
 
 #Script to setup golden image with Azure Image Builder
 
-
 #Create temp folder
 New-Item -Path 'C:\temp' -ItemType Directory -Force | Out-Null
 
+# Install Chocolatey
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-#Install VSCode
-Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?Linkid=852157' -OutFile 'c:\temp\VScode.exe'
-Invoke-Expression -Command 'c:\temp\VScode.exe /verysilent'
+# Chocolatey Globally Auto confirm every action
+choco feature enable -n allowGlobalConfirmation
+
+# Chocolatey install VSCode
+choco install VScode
+
+#Start sleep
+Start-Sleep -Seconds 10
+
+# Chocolatey install Chrome
+choco install GoogleChrome
 
 #Start sleep
 Start-Sleep -Seconds 10
 
-#InstallNotepadplusplus
-Invoke-WebRequest -Uri 'https://notepad-plus-plus.org/repository/7.x/7.7.1/npp.7.7.1.Installer.x64.exe' -OutFile 'c:\temp\notepadplusplus.exe'
-Invoke-Expression -Command 'c:\temp\notepadplusplus.exe /S'
+# Chocolatey install Notepad++
+choco install notepadplusplus
 
 #Start sleep
 Start-Sleep -Seconds 10
+
+# Chocolatey install Windows Terminal
+choco install microsoft-windows-terminal
+
+#Start sleep
+Start-Sleep -Seconds 10
+
+##Install VSCode
+#Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?Linkid=852157' -OutFile 'c:\temp\VScode.exe'
+#Invoke-Expression -Command 'c:\temp\VScode.exe /verysilent'
+
+##Start sleep
+#Start-Sleep -Seconds 10
+
+##InstallNotepadplusplus
+#Invoke-WebRequest -Uri 'https://notepad-plus-plus.org/repository/7.x/7.7.1/npp.7.7.1.Installer.x64.exe' -OutFile 'c:\temp\notepadplusplus.exe'
+#Invoke-Expression -Command 'c:\temp\notepadplusplus.exe /S'
+
+##Start sleep
+#Start-Sleep -Seconds 10
 
 ##InstallFSLogix
 #Invoke-WebRequest -Uri 'https://aka.ms/fslogix_download' -OutFile 'c:\temp\fslogix.zip'
