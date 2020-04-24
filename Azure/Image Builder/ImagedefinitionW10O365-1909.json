@@ -65,13 +65,13 @@
 					{
 						"type": "PowerShell",
 						"name": "InstallChocolatey",
-						"runElevated": "true",
+						"runElevated": true,
 						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/InstallChocolatey.ps1"
 					},
 					{
 						"type": "PowerShell",
 						"name": "InstallApps",
-						"runElevated": "true",
+						"runElevated": true,
 						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/PowershellCustomizationW10O365-1909.ps1"
 					},
 					{
