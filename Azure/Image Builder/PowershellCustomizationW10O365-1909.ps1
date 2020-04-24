@@ -4,12 +4,6 @@
 #Create temp folder
 New-Item -Path 'C:\temp' -ItemType Directory -Force | Out-Null
 
-# Install Chocolatey
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-
-# Chocolatey Globally Auto confirm every action
-choco feature enable -n allowGlobalConfirmation
-
 # Chocolatey install VSCode
 choco install VScode
 

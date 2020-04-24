@@ -76,6 +76,11 @@
 				"customize": [
 					{
 						"type": "PowerShell",
+						"name": "InstallChocolatey",
+						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/InstallChocolatey.ps1"
+					},
+					{
+						"type": "PowerShell",
 						"name": "InstallApps",
 						"scriptUri": "[parameters('ScriptUri')]"
 					},
