@@ -4,6 +4,9 @@
 #Create temp folder
 New-Item -Path 'C:\temp' -ItemType Directory -Force | Out-Null
 
+# Chocolatey Globally Auto confirm every action
+choco feature enable -n allowGlobalConfirmation
+
 # Chocolatey install VSCode
 choco install VScode
 
