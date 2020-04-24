@@ -65,15 +65,19 @@
 					{
 						"type": "PowerShell",
 						"name": "InstallChocolatey",
+						"runElevated": "true",
 						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/InstallChocolatey.ps1"
 					},
 					{
 						"type": "PowerShell",
 						"name": "InstallApps",
+						"runElevated": "true",
 						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/PowershellCustomizationW10O365-1909.ps1"
 					},
 					{
 						"type": "WindowsRestart",
+						"restartCommand": "shutdown /r /f /t 0", 
+						"restartCheckCommand": "echo Azure-Image-Builder-Restarted-the-VM  > c:\\temp\\azureImageBuilderRestart.txt",
 						"restartTimeout": "30m"
 					},
 					{
@@ -83,7 +87,7 @@
 							"exclude:$_.Title -like '*Preview*'",
 							"include:$true"
 									],
-						"updateLimit": 50
+						"updateLimit": 20
 					}
 				],
 				"distribute": [
