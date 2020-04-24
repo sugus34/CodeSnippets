@@ -37,7 +37,7 @@
 		},
 		"ManagedImageName": {
 			"type": "string",
-			"defaultValue": "AIB-W10Image",
+			"defaultValue": "AIB-W10Image2",
 			"metadata": {
 				"description": "Name of the managed image, it will be created in the AIB resourcegroup"
 			}
@@ -60,12 +60,6 @@
 			"dependsOn": [
 			],
 			"properties": {
-			    "buildTimeoutInMinutes" : 100,
-				"vmProfile": 
-					{
-					"vmSize": "Standard_D4s_v3",
-					"osDiskSizeGB": 63
-					},
 				"source": {
 					"type": "PlatformImage",
 					"publisher": "[parameters('publisher')]",
