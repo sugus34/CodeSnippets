@@ -21,13 +21,6 @@
 				"description": "Version of the image, can be found with powershell: Get-AzVMImage -Location westeurope -PublisherName MicrosoftWindowsDesktop -Offer windows-10 -Skus 19h1-evd"
 			}
 		},
-		"ScriptUri": {
-			"type": "string",
-			"defaultValue": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/PowershellCustomizationW10O365-1909.ps1",
-			"metadata": {
-				"description": "Location of powershell script to customize your image"
-			}
-		},
 		"SIGImageDefinitionId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/9b4d1c86-8825-47d7-94fd-a0d5380ebe5b/resourceGroups/rg-ImageGallery-WEU/providers/Microsoft.Compute/galleries/SharedImageGallery/images/w101909o365pp",
@@ -76,7 +69,7 @@
 					{
 						"type": "PowerShell",
 						"name": "InstallApps",
-						"scriptUri": "[parameters('ScriptUri')]"
+						"scriptUri": "https://raw.githubusercontent.com/sugus34/CodeSnippets/master/Azure/Image%20Builder/PowershellCustomizationW10O365-1909.ps1"
 					},
 					{
 						"type": "WindowsRestart",
