@@ -1,0 +1,94 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"publisher": {
+			"type": "string",
+			"defaultValue": "MicrosoftWindowsDesktop"
+		},
+		"offer": {
+			"type": "string",
+			"defaultValue": "Windows-10"
+		},
+		"sku": {
+			"type": "string",
+			"defaultValue": "19h2-evd"
+		},
+		"version": {
+			"type": "string",
+			"defaultValue": "latest",
+			"metadata": {
+				"description": "Version of the image, can be found with powershell: Get-AzVMImage -Location westeurope -PublisherName MicrosoftWindowsDesktop -Offer windows-10 -Skus 19h1-evd"
+			}
+		},
+		"SIGImageDefinitionId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/e27def5c-c199-4f25-bd90-1a90d87096fe/resourceGroups/RSGR_HRS_EUWE_PR_ImageGallery_01/providers/Microsoft.Compute/galleries/SIMG_HRS_EUWE_PR_WVD_01/images/w101909wvd",
+			"metadata": {
+				"description": "Id of Shared Image Gallery to distribute image to, eg: /subscriptions/<subscriptionID>/resourceGroups/<SIG resourcegroup>/providers/Microsoft.Compute/galleries/<SIG name>/images/<image definition>"
+			}
+		},
+		"randomGUID": {
+			"type": "string",
+			"defaultValue": "[newGuid()]"
+		}
+	},
+	"variables": {
+		"imageTemplateName": "[concat('AIB',uniqueString('deployment().name',parameters('randomGUID')))]"
+	},
+	"resources": [
+		{
+			"name": "[variables('imageTemplateName')]",
+			"type": "Microsoft.VirtualMachineImages/imageTemplates",
+			"apiVersion": "2019-05-01-preview",
+			"location": "[resourcegroup().location]",
+			"dependsOn": [
+			],
+			"properties": {
+				"buildTimeoutInMinutes" : 100,
+				"source": {
+					"type": "PlatformImage",
+					"publisher": "[parameters('publisher')]",
+					"offer": "[parameters('offer')]",
+					"sku": "[parameters('sku')]",
+					"version": "[parameters('version')]"
+				},
+				"customize": [
+					{
+						"type": "WindowsRestart",
+						"restartCommand": "shutdown /r /f /t 0", 
+						"restartCheckCommand": "echo Azure-Image-Builder-Restarted-the-VM  > c:\\temp\\azureImageBuilderRestart.txt",
+						"restartTimeout": "30m"
+					},
+					{
+						"type": "WindowsUpdate",
+						"searchCriteria": "IsInstalled=0",
+						"filters": [
+							"exclude:$_.Title -like '*Preview*'",
+							"include:$true"
+									],
+						"updateLimit": 20
+					}
+				],
+				"distribute": [
+					{
+						"type": "SharedImage",
+						"galleryImageId": "[parameters('SIGImageDefinitionId')]",
+						"runOutputName": "SIGimage",
+						"artifactTags": {
+						},
+						"replicationRegions": [
+							"westeurope"
+						]
+					}				
+				]
+			}
+		}
+	],
+	"outputs": {
+		"ImageTemplateName": {
+			"type": "string",
+			"value": "[variables('imageTemplateName')]"
+		}
+	}
+} 
