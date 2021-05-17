@@ -1,0 +1,91 @@
+{
+    "name": "DIGA-WVD-20H2",
+    "type": "Microsoft.VirtualMachineImages/imageTemplates",
+    "apiVersion": "2020-02-14",
+    "location": "WestEurope",
+    "dependsOn": [],
+    "tags": {
+        "imagebuilderTemplate": "AzureImageBuilderSIG",
+        "userIdentity": "enabled"
+            },
+        "identity": {
+            "type": "UserAssigned",
+                    "userAssignedIdentities": {
+                    "/subscriptions/f6746d04-4d5a-40db-b688-72e59f8cd97f/resourceGroups/RSGR_DIGA_EUWE_PR_WVD_ImageBuilder/providers/Microsoft.ManagedIdentity/userAssignedIdentities/AAGA_DIGA_EUWE_PR_WVD_01-Identity": {}
+                        
+                }
+                },
+    
+    "properties": {
+        "buildTimeoutInMinutes" : 100,
+
+        "vmProfile": 
+                {
+                "vmSize": "Standard_D4s_v4",
+                "osDiskSizeGB": 127
+                },
+    
+        "source": {
+            "type": "PlatformImage",
+                "publisher": "MicrosoftWindowsDesktop",
+                "offer": "office-365",
+                "sku": "20h2-evd-o365pp",
+                "version": "latest"
+            
+        },
+        "customize": [
+
+                {
+                        "type": "PowerShell",
+                        "name": "OptimizeOS",
+                        "runElevated": true,
+                        "runAsSystem": true,
+                        "validExitCodes" : [0,1],
+                        "scriptUri": "https://stordigaaib01s.blob.core.windows.net/scripts/WVD_Optimizations/1_Optimize_OS_for_WVD.ps1"
+                },
+                {
+                    "type": "WindowsRestart",
+                    "restartCheckCommand": "write-host 'restarting post Optimizations'",
+                    "restartTimeout": "10m"
+                },
+                {
+                    "type": "PowerShell",
+                    "name": "InstallTeams",
+                    "runElevated": true,
+                    "runAsSystem": true,
+                    "scriptUri": "https://stordigaaib01s.blob.core.windows.net/scripts/WVD_Optimizations/2_installTeams.ps1"
+            },
+            {
+                "type": "WindowsRestart",
+                "restartCheckCommand": "write-host 'restarting post Teams Install'",
+                "restartTimeout": "10m"
+            },
+                {
+                    "type": "WindowsUpdate",
+                    "searchCriteria": "IsInstalled=0",
+                    "filters": [
+                        "exclude:$_.Title -like '*Preview*'",
+                        "include:$true"
+                                ],
+                    "updateLimit": 40
+                }
+
+        ],
+        "distribute": 
+        [
+            {   
+                "type": "SharedImage",
+                "galleryImageId": "/subscriptions/f6746d04-4d5a-40db-b688-72e59f8cd97f/resourceGroups/RSGR_DIGA_SCNO_CO_Storage_01/providers/Microsoft.Compute/galleries/SIGA_DIGA_SCNO_CO_01/images/DIGA-WVD-20H2",
+                "runOutputName": "DIGA-WVD-20H2",
+                "excludeFromLatest": true,
+                "artifactTags": {
+                    "source": "azureVmImageBuilder",
+                    "baseosimg": "20h2-evd-o365pp"
+                },
+                "replicationRegions": [
+                  "SwitzerlandNorth"
+                ]
+            }
+        ]
+        }
+    }
