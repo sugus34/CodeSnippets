@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configurations>
+  <WhatIf value="true" />
+  <Farm ConfigDB="SP_ConfigDB" AdminContentDB="SP_Content_Admin" DatabaseServer="SQLSP2016PROD" Passphrase="assaKdqYrcgOpgBY@6NbmR7cz#20BX">
+    <Account Ref="SPFarm" />
+    <Environment Name="PROD"/> <!-- PROD = mehrere Server in einer Farm / DEV = Single Server Farm -->
+    <Email MailServer="XXX.XXX.ch" FromAddress="sharepoint@XXX.ch" Reply="noreply@XXX.ch" Charset="65001" />
+  </Farm>
+
+  <Servers>
+    <Server ID="App1" Name="SERVER01" /> <!-- Front-end -->
+	<Server ID="App2" Name="SERVER02" /> <!-- Application -->
+	<Server ID="App3" Name="SERVER03" /> <!-- Distributed Cache -->
+	<Server ID="App4" Name="SERVER04" /> <!-- Search -->
+  </Servers>
+
+  <CentralAdmin Port="7777" AuthProvider="NTLM">
+    <Servers>
+      <Server Ref="App1" />
+    </Servers>
+  </CentralAdmin>
+
+  <Accounts>
+    <Account ID="SPFarm" Name="XXX\sa-spfarm" DisplayName="XXX\sa-spfarm" Password="XXX"></Account>
+    <Account ID="SPASServices" Name="XXX\sa-spservices" DisplayName="XXX\sa-spservices" Password="XXX"></Account>
+    <Account ID="SPASSearchAppPool" Name="XXX\sa-spsearch" DisplayName="XXX\sa-spsearch" Password="XXX"></Account>
+    <Account ID="SPASSearchAdmin" Name="XXX\sa-spsearchadmin" DisplayName="XXX\sa-spsearchadmin" Password="XXX"></Account>
+    <Account ID="SP_AppPool" Name="XXX\sa-spapppool" DisplayName="XXX\sa-spapppool" Password="XXX"></Account>
+    <!-- <Account ID="SP_Collab" Name="XXX\sa-spcollab" DisplayName="XXX\sa-spcollab" Password="XXX"></Account> -->
+    <!-- <Account ID="SP_Applications" Name="XXX\sa-spapplications" DisplayName="XXX\sa-spapplications" Password="XXX"></Account> -->
+    <!-- <Account ID="SPASAccess" Name="XXX\sa-spaccess" DisplayName="XXX\sa-spaccess" Password="XXX"></Account> -->
+  </Accounts>
+
+  <Backup Path="D:\SharePointBackup" KeepDays="2" SMTPServer="mail.kunde.local" MailFrom="spbackup@kunde.local" MailTo="servicedesk@kunde.local" />
+
+  <ServiceAppPool Name="SP_ApplicationServices">
+    <Account Ref="SPASServices" />
+  </ServiceAppPool>
+
+  <Services>
+    <BCS Name="Business Data Connetivity Service Application" DBName="SP_AS_BCS" AppPoolName="SP_ApplicationServices"/>
+	<SecureStore Name="Secure Store Service Application" DBName="SP_AS_SecureStore" AppPoolName="SP_ApplicationServices"/>
+    <UsageApplicationService collectioDB="SP_AS_UsageApplication" LogPfad="D:\Microsoft Office Servers\Logs" />
+    <StateService DBName="SP_AS_State" />
+    <EnterpriseSearch AppPoolName="SP_AS_Search" DBName="SP_AS_Search">
+      <Account Ref="SPASSearchAppPool" />
+      <Account Ref="SPASSearchAdmin" />
+	  <IndexLocation>D:\Microsoft Office Servers\16.0\Data\Office Server\Applications\Index</IndexLocation>
+    </EnterpriseSearch>
+    <ManagedMetadata Name="Managed Metadata Service Application" DBName="SP_AS_ManagedMetadata" AppPoolName="SP_ApplicationServices" />
+    <UserProfileService Name="User Profile Service Application" AppPoolName="SP_ApplicationServices" MySiteURL="https://people.XXX.ch">
+    <Account Ref="SPFarm" />
+    <Account Ref="SPASSearchAdmin" />
+    <Account Ref="SPASServices" />
+      <DB>
+        <Profile>SP_AS_UPS_Profile</Profile>
+        <Sync>SP_AS_UPS_Sync</Sync>
+        <Social>SP_AS_UPS_Social</Social>
+      </DB>
+    </UserProfileService>
+	<VisioGraphicsService Name="Visio Graphics Service Application" AppPoolName="SP_ApplicationServices" />
+	
+	<!-- optional 
+    <Apps AppPoolName="SP_ApplicationServices" ServiceName="App Management Service" DBName="SP_AS_AppService" AppDomain="XXX.ch" AppPrefix="app" BindingWebApp="SP_Root">
+        <AppCatalog ManagePath="appscatalog" Name="Apps Catalog" language="1031" template="APPCATALOG#0" />
+        <Subscription ServiceName="Subscription Settings Service" DBName="SP_AS_SubscriptionSettings" AppPoolName="SP_ApplicationServices" />
+    </Apps>
+    <AccessService AppPoolName="SP_AS_Access" ServiceName="Access Service" SQLServerAlias="SPACCESSSERVICE">
+        <Account Ref="SPASAccess" />
+    </AccessService>
+    -->
+  </Services>
+
+  <WebApplications spadmin="XXX\sa-spsetup">
+	<!-- 1031 Deutsch; 1033 English; 1036 French; 1040 Italian -->
+
+    <!-- WebApp SP_HostHeader -->
+    <WebApplication Name="SP_Root" AppPoolName="SP_AppPool" Port="443" WebAppDBName="SP_Content_Root" url="https://root.XXX.ch" hostnamesc="yes" WebSitePath="D:\wea\webs\" language="1031" template="STS#0" >
+      <Account Ref="SP_AppPool" />
+      <ManagedPaths>
+        <Path Name="cthub" Type="explicit" />
+        <Path Name="location" Type="wildcard" />
+      </ManagedPaths>
+      <!-- Storage Size XGB = x * 1024 * 1024 * 1024 Beispiel 10GB --> 
+      <Quotas Name="Default-SP_Root" StorageMax="10737418240" StorageWarning="9663676416" UserCodeMax="300" UserCodeWarning="100" AssignWebApp="False">
+        <URLs>
+            <URL Name="https://intranet.XXX.ch" />
+            <URL Name="https://department.XXX.ch" />
+            <URL Name="https://qm.XXX.ch" />
+        </URLs>  
+      </Quotas>	  
+
+      <SiteCollections>
+        <SiteCollection url="https://intranet.XXX.ch" name="Intranet" language="1031" template="STS#0" contentDB="SP_Content_Root_Intranet" redirect="true" />
+        <SiteCollection url="https://intranet.XXX.ch/cthub" name="Content Type Hub" language="1031" template="BLANKINTERNETCONTAINER#0" contentDB="SP_Content_Root_Intranet_CtHub" />
+        <SiteCollection url="https://intranet.XXX.ch/location/StandortA" name="Intranet Standort A" language="1031" template="STS#0" contentDB="SP_Content_Root_Intranet_LocationA" />
+        <SiteCollection url="https://intranet.XXX.ch/location/StandortB" name="Intranet Standort B" language="1031" template="STS#0" contentDB="SP_Content_Root_Intranet_LocationB" />
+		
+        <SiteCollection url="https://search.XXX.ch" name="Search" language="1031" template="SRCHCEN#0" contentDB="SP_Content_Root_Search" redirect="true" />
+		
+        <SiteCollection url="https://department.XXX.ch" name="Department" language="1031" template="STS#0" contentDB="SP_Content_Root_Department" redirect="true"/>
+        <SiteCollection url="https://department.XXX.ch/sites/DivisonX" name="Divison X" language="1031" template="STS#0" contentDB="SP_Content_Root_Department_DivisionX" />
+        <SiteCollection url="https://department.XXX.ch/sites/DivisonY" name="Divison Y" language="1031" template="STS#0" contentDB="SP_Content_Root_Department_DivisionY" />
+        <SiteCollection url="https://department.XXX.ch/sites/DivisonZ" name="Divison Z" language="1031" template="STS#0" contentDB="SP_Content_Root_Department_DivisionZ" />
+		
+        <SiteCollection url="https://qm.XXX.ch" name="QM" language="1031" template="STS#0" contentDB="SP_Content_Root_QM" redirect="true"/>
+      </SiteCollections>
+    </WebApplication>
+    
+    <!-- WebApp SP_People -->
+    <WebApplication Name="SP_People" AppPoolName="SP_AppPool" Port="443" WebAppDBName="SP_Content_People01" url="https://people.XXX.ch" redirect="true" hostnamesc="no" hostheaderurl="people.XXX.ch" WebSitePath="D:\wea\webs\" language="1031" template="SPSMSITEHOST#0">
+      <Account Ref="SP_AppPool" />
+      <ManagedPaths>
+      </ManagedPaths>
+      <Quotas>
+      </Quotas>	  
+      <SiteCollections>
+      </SiteCollections>
+    </WebApplication>
+	
+    <!-- WebApp SP_Collab
+    <WebApplication Name="SP_Collab" AppPoolName="SP_Collab" Port="443" WebAppDBName="SP_Content_Collab" url="https://collab.XXX.ch" redirect="true" hostnamesc="no" hostheaderurl="collab.XXX.ch" WebSitePath="D:\wea\webs\" language="1031" template="STS#0" SCName="Collaboration">
+      <Account Ref="SP_Collab" />
+      <ManagedPaths>
+        <Path Name="projects" Type="wildcard" />
+        <Path Name="boards" Type="wildcard" />
+      </ManagedPaths>
+      <Quotas Name="Default-SP_Collab" StorageMax="10737418240" StorageWarning="9663676416" UserCodeMax="300" UserCodeWarning="100" AssignWebApp="True">
+        <URLs>
+            <URL Name="https://collab.XXX.ch"/>
+        </URLs>  
+      </Quotas>	  
+      <SiteCollections>
+        <SiteCollection url="https://collab.XXX.ch/projects/p2" name="Project 2" language="1031" template="STS#0" contentDB="SP_Content_Collab_Projects_P2" />
+        <SiteCollection url="https://collab.XXX.ch/boards/b1" name="Boards 1" language="1031" template="STS#0" contentDB="SP_Content_Collab_Boards_P1" />
+      </SiteCollections>
+    </WebApplication>
+    -->
+
+     <!-- WebApp SP_Applications
+    <WebApplication Name="SP_Applications" AppPoolName="SP_Applications" Port="443" WebAppDBName="SP_Content_Applications" url="https://applications.XXX.ch" redirect="true" hostnamesc="no" hostheaderurl="applications.XXX.ch" WebSitePath="D:\wea\webs\" language="1031" template="STS#0" SCName="Applications">
+      <Account Ref="SP_Applications" />
+      <ManagedPaths>
+        <Path Name="app" Type="wildcard" />
+      </ManagedPaths>
+      <Quotas Name="Default-SP_Applications"  StorageMax="10737418240" StorageWarning="9663676416" UserCodeMax="300" UserCodeWarning="100" AssignWebApp="True">
+        <URLs>
+            <URL Name="https://applications.XXX.ch"/>
+        </URLs>  
+      </Quotas>	  
+      <SiteCollections>
+        <SiteCollection url="https://applications.XXX.ch/app/appA" name="App A" language="1031" template="STS#0" contentDB="SP_Content_Applications_AppA" />
+        <SiteCollection url="https://applications.XXX.ch/app/appB" name="App B" language="1031" template="STS#0" contentDB="SP_Content_Applications_AppB" />
+      </SiteCollections>
+    </WebApplication>
+    -->
+	
+  </WebApplications>
+</Configurations>
