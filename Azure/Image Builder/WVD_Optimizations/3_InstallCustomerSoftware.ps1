@@ -12,7 +12,7 @@ Write-Host 'AIB Customization: Downloading Custom Software'
 Invoke-WebRequest -Uri $osOptURL -OutFile $outputPath
 Write-Host 'AIB Customization: Extracting Custom Software'
 Expand-Archive -LiteralPath 'C:\\Work\\CUST_Software.zip' -DestinationPath $Localpath -Force -Verbose
-Set-Location -Path C:\\Work\\
+Set-Location -Path C:\\Work\\Software\\
 
 # run script
 Write-Host 'AIB Customization: Starting Custom Software Installation'
